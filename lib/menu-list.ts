@@ -54,6 +54,10 @@ export function getMenuList(pathname: string): Group[] {
               href: '/kanji',
               label: 'Hán tự',
             },
+            {
+              href: '/composition',
+              label: 'Bộ thủ',
+            },
           ],
         },
         {

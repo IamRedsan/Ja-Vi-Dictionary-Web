@@ -17,15 +17,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { DataTablePagination } from './pagination';
+import { IUser } from './user-rows';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  setData: React.Dispatch<React.SetStateAction<IUser[]>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  setData,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
