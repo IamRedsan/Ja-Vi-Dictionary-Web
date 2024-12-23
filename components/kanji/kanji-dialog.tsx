@@ -7,10 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { WordForm } from './word-form';
+import { KanjiForm } from './kanji-form';
 import { ScrollArea } from '../ui/scroll-area';
 
-interface WordDialogProps {
+interface KanjiDialogProps {
   action: 'view' | 'update' | 'create';
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -18,13 +18,13 @@ interface WordDialogProps {
   description: string;
 }
 
-export function WordDialog({
+export function KanjiDialog({
   action,
   title,
   description,
   isOpen,
   setIsOpen,
-}: WordDialogProps) {
+}: KanjiDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className='md:h-[90%] h-full md:min-w-[90%] min-w-full flex flex-col'>
@@ -34,7 +34,7 @@ export function WordDialog({
         </DialogHeader>
         <ScrollArea className='rounded-md flex-grow'>
           <div className='px-4'>
-            <WordForm action={action} />
+            <KanjiForm action={action} />
           </div>
         </ScrollArea>
         <DialogFooter>

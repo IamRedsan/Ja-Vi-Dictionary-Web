@@ -37,10 +37,16 @@ export function LoginForm({
         email: data.email,
         password: data.password,
       });
-
       const { user, refreshToken, accessToken } = response.data.data;
 
-      login(user, accessToken, refreshToken);
+      if (user.role !== 'admin') {
+        toast({
+          title: 'Đăng nhập thất bại',
+          description: 'Bạn không có quyền đăng nhập vao trang này.',
+        });
+      } else {
+        login(user, accessToken, refreshToken);
+      }
     } catch (error) {
       const e = error as AxiosError;
       const message = (e.response?.data as any)?.message as any;

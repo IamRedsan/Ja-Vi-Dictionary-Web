@@ -1,6 +1,7 @@
 'use client';
 
 import { authClient } from '@/client/axiosClient';
+import { useToast } from '@/hooks/use-toast';
 import React, {
   createContext,
   useContext,
@@ -15,6 +16,7 @@ interface User {
   fullname: string;
   avatar?: string;
   role: 'user' | 'admin';
+  created_at: string;
 }
 
 interface AuthContextType {
@@ -34,6 +36,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const login = (userData: User, accessToken: string, refreshToken: string) => {
     setUser(userData);
@@ -60,8 +63,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (accessToken) {
           const response = await authClient.get('users/profile');
           const user = response.data.data;
-
-          setUser(user);
+          if (user.role !== 'admin') {
+            toast({
+              title: 'Đăng nhập thất bại',
+              description: 'Bạn không có quyền đăng nhập vao trang này.',
+            });
+          } else {
+            setUser(user);
+          }
         }
       } catch (error) {
         console.error('Failed to load user:', error);
@@ -71,6 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     loadUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
