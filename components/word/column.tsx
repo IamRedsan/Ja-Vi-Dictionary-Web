@@ -11,16 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { WordDialog } from './word-dialog';
-import { useState } from 'react';
+import { useWord } from '@/context/word-context';
 
-export type Word = {
+export type WordRow = {
+  _id: string;
   text: string;
   hiragana: string;
   meaning: string;
 };
 
-export const columns: ColumnDef<Word>[] = [
+export const columns: ColumnDef<WordRow>[] = [
   {
     accessorKey: 'text',
     header: 'Từ vựng',
@@ -35,51 +35,47 @@ export const columns: ColumnDef<Word>[] = [
   },
   {
     id: 'actions',
-    cell: () => {
-      const [isOpenUpdateDialog, setIsOpenUpdateDialog] = useState(false);
-      const [isOpenViewDialog, setIsOpenViewDialog] = useState(false);
+    cell: ({ row }) => {
+      const { setWordById, setDialogAction, setIsOpenDialog } = useWord();
+
+      const word = row.original;
 
       return (
-        <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Mở menu</span>
-                <MoreHorizontal className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem
-                onClick={() => {
-                  setIsOpenViewDialog(true);
-                }}>
-                Chi tiết
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  setIsOpenUpdateDialog(true);
-                }}>
-                Cập nhật
-              </DropdownMenuItem>
-              <DropdownMenuItem>Xóa</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <WordDialog
-            action='update'
-            isOpen={isOpenUpdateDialog}
-            setIsOpen={setIsOpenUpdateDialog}
-            title='Cập nhật tự vựng'
-            description='Điền thông tin từ vựng. Vui lòng bấm lưu xong khi điền xong.'
-          />
-          <WordDialog
-            action='view'
-            isOpen={isOpenViewDialog}
-            setIsOpen={setIsOpenViewDialog}
-            title='Từ vựng'
-            description=''
-          />
-        </>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' className='h-8 w-8 p-0'>
+              <span className='sr-only'>Mở menu</span>
+              <MoreHorizontal className='h-4 w-4' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuItem
+              onClick={() => {
+                setDialogAction('view');
+                setWordById(word._id);
+                setIsOpenDialog(true);
+              }}>
+              Chi tiết
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                setDialogAction('update');
+                setWordById(word._id);
+                setIsOpenDialog(true);
+              }}>
+              Cập nhật
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setDialogAction('delete');
+                setWordById(word._id);
+                setIsOpenDialog(true);
+              }}>
+              Xóa
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },

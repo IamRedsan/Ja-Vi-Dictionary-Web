@@ -4,7 +4,6 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 
@@ -18,6 +17,7 @@ import {
 } from '@/components/ui/table';
 
 import { DataTablePagination } from './pagination';
+import { useWord } from '@/context/word-context';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -28,11 +28,18 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const { pagination, setPagination, pageCount } = useWord();
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
+    pageCount: pageCount,
+    state: {
+      pagination,
+    },
+    onPaginationChange: setPagination,
   });
 
   return (

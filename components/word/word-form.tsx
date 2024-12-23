@@ -3,33 +3,14 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card } from '../ui/card';
-import { useEffect, useState } from 'react';
-
-interface Word {
-  text: string;
-  reading: string[];
-  meaning: {
-    type: string;
-    meaning: string;
-  }[];
-  example: {
-    text: string;
-    hiragana: string;
-    meaning: string;
-  }[];
-}
+import { useWord } from '@/context/word-context';
 
 interface WordFormProps {
   action: 'view' | 'update' | 'create';
 }
 
 export function WordForm({ action }: WordFormProps) {
-  const [word, setWord] = useState<Word>({
-    text: '',
-    reading: [''],
-    meaning: [{ type: '', meaning: '' }],
-    example: [],
-  });
+  const { word, setWord, loading } = useWord();
 
   const hanleChangeText = (text: string) => {
     setWord((prevWord) => ({
@@ -38,17 +19,19 @@ export function WordForm({ action }: WordFormProps) {
     }));
   };
 
-  const handleChangeReading = (text: string, index: number) => {
+  const handleChangeHiragana = (text: string, index: number) => {
     setWord((prevWord) => ({
       ...prevWord,
-      reading: prevWord.reading.map((value, i) => (i === index ? text : value)),
+      hiragana: prevWord.hiragana.map((value, i) =>
+        i === index ? text : value
+      ),
     }));
   };
 
   const handleChangeMeaning = (
     text: string,
     index: number,
-    field: 'type' | 'meaning'
+    field: 'type' | 'content'
   ) => {
     setWord((prevWord) => ({
       ...prevWord,
@@ -65,30 +48,30 @@ export function WordForm({ action }: WordFormProps) {
   ) => {
     setWord((prevWord) => ({
       ...prevWord,
-      example: prevWord.example.map((value, i) =>
+      examples: prevWord.examples.map((value, i) =>
         i === index ? { ...value, [field]: text } : value
       ),
     }));
   };
 
-  const handleAddReading = () => {
+  const handleAddHiragana = () => {
     setWord((prevWord) => ({
       ...prevWord,
-      reading: [...prevWord.reading, ''],
+      hiragana: [...prevWord.hiragana, ''],
     }));
   };
 
-  const handleRemoveReading = (index: number) => {
+  const handleRemoveHiragana = (index: number) => {
     setWord((prevWord) => ({
       ...prevWord,
-      reading: prevWord.reading.filter((_, i) => i !== index),
+      hiragana: prevWord.hiragana.filter((_, i) => i !== index),
     }));
   };
 
   const handleAddMeaning = () => {
     setWord((prevWord) => ({
       ...prevWord,
-      meaning: [...prevWord.meaning, { type: '', meaning: '' }],
+      meaning: [...prevWord.meaning, { type: '', content: '' }],
     }));
   };
 
@@ -102,38 +85,18 @@ export function WordForm({ action }: WordFormProps) {
   const handleAddExample = () => {
     setWord((prevWord) => ({
       ...prevWord,
-      example: [...prevWord.example, { text: '', hiragana: '', meaning: '' }],
+      examples: [...prevWord.examples, { text: '', hiragana: '', meaning: '' }],
     }));
   };
 
   const handleRemoveExample = (index: number) => {
     setWord((prevWord) => ({
       ...prevWord,
-      example: prevWord.example.filter((_, i) => i !== index),
+      examples: prevWord.examples.filter((_, i) => i !== index),
     }));
   };
 
-  const hardDisabled = action === 'view';
-
-  useEffect(() => {
-    if (action !== 'create') {
-      setWord({
-        text: '黄昏',
-        reading: ['たそがれ', 'こうこん'],
-        meaning: [
-          { type: 'Danh từ', meaning: 'Hoàng hôn' },
-          { type: 'Danh từ', meaning: 'Chiều tàn' },
-        ],
-        example: [
-          {
-            text: '黄昏の町',
-            hiragana: 'たそがれのまち',
-            meaning: 'Thị trấn chiều tàn',
-          },
-        ],
-      });
-    }
-  }, [action]);
+  const disabled = action === 'view' || loading;
 
   return (
     <div className='grid md:grid-cols-2 gap-8 py-4 grid-cols-1 items-start'>
@@ -149,44 +112,44 @@ export function WordForm({ action }: WordFormProps) {
             onChange={(e) => {
               hanleChangeText(e.currentTarget.value);
             }}
-            disabled={hardDisabled}
+            disabled={disabled}
           />
         </div>
         <div className='grid grid-cols-4 items-center gap-4'>
-          <Label htmlFor='reading' className='text-right'>
+          <Label htmlFor='hiragana' className='text-right'>
             Cách đọc
           </Label>
           <Input
-            id='reading'
+            id='hiragana'
             className='col-span-3'
-            value={word.reading[0]}
+            value={word.hiragana[0]}
             onChange={(e) => {
-              handleChangeReading(e.currentTarget.value, 0);
+              handleChangeHiragana(e.currentTarget.value, 0);
             }}
-            disabled={hardDisabled}
+            disabled={disabled}
           />
         </div>
-        {word.reading.map((reading, index) => {
+        {word.hiragana.map((hiragana, index) => {
           if (index === 0) return null;
           return (
             <div className='grid grid-cols-4 gap-4' key={index}>
               <div className='col-span-3 col-start-2 grid grid-cols-10 gap-2'>
                 <Input
                   className='col-span-9'
-                  value={reading}
+                  value={hiragana}
                   onChange={(e) => {
-                    handleChangeReading(e.currentTarget.value, index);
+                    handleChangeHiragana(e.currentTarget.value, index);
                   }}
-                  disabled={hardDisabled}
+                  disabled={disabled}
                 />
                 <Button
                   variant='ghost'
                   size='icon'
                   className='rounded-full aspect-square'
                   onClick={() => {
-                    handleRemoveReading(index);
+                    handleRemoveHiragana(index);
                   }}
-                  disabled={hardDisabled}>
+                  disabled={disabled}>
                   <X />
                 </Button>
               </div>
@@ -199,8 +162,8 @@ export function WordForm({ action }: WordFormProps) {
               variant='outline'
               size='icon'
               className='rounded-full aspect-square'
-              onClick={handleAddReading}
-              disabled={hardDisabled}>
+              onClick={handleAddHiragana}
+              disabled={disabled}>
               <Plus />
             </Button>
           </div>
@@ -217,15 +180,15 @@ export function WordForm({ action }: WordFormProps) {
               onChange={(e) => {
                 handleChangeMeaning(e.currentTarget.value, 0, 'type');
               }}
-              disabled={hardDisabled}
+              disabled={disabled}
             />
             <Input
               className='col-span-8 md:col-span-7'
-              value={word.meaning[0].meaning}
+              value={word.meaning[0].content}
               onChange={(e) => {
-                handleChangeMeaning(e.currentTarget.value, 0, 'meaning');
+                handleChangeMeaning(e.currentTarget.value, 0, 'content');
               }}
-              disabled={hardDisabled}
+              disabled={disabled}
             />
           </div>
         </div>
@@ -240,19 +203,19 @@ export function WordForm({ action }: WordFormProps) {
                   onChange={(e) => {
                     handleChangeMeaning(e.currentTarget.value, index, 'type');
                   }}
-                  disabled={hardDisabled}
+                  disabled={disabled}
                 />
                 <Input
                   className='col-span-7 md:col-span-6'
-                  value={meaning.meaning}
+                  value={meaning.content}
                   onChange={(e) => {
                     handleChangeMeaning(
                       e.currentTarget.value,
                       index,
-                      'meaning'
+                      'content'
                     );
                   }}
-                  disabled={hardDisabled}
+                  disabled={disabled}
                 />
                 <Button
                   variant='ghost'
@@ -261,7 +224,7 @@ export function WordForm({ action }: WordFormProps) {
                   onClick={() => {
                     handleRemoveMeaning(index);
                   }}
-                  disabled={hardDisabled}>
+                  disabled={disabled}>
                   <X />
                 </Button>
               </div>
@@ -275,27 +238,29 @@ export function WordForm({ action }: WordFormProps) {
               size='icon'
               className='rounded-full aspect-square'
               onClick={handleAddMeaning}
-              disabled={hardDisabled}>
+              disabled={disabled}>
               <Plus />
             </Button>
           </div>
         </div>
       </div>
       <div className='flex flex-col gap-4'>
-        {word.example.map((example, index) => {
+        {word.examples?.map((examples, index) => {
           return (
             <Card key={index}>
               <div className='relative p-4'>
                 <div className='grid gap-4'>
                   <Label className='text-center'>Ví dụ</Label>
                   <div className='grid grid-cols-5 items-center gap-4'>
-                    <Label htmlFor='example-text' className='text-right'>
+                    <Label
+                      htmlFor={`examples-text-${index}`}
+                      className='text-right'>
                       Câu
                     </Label>
                     <Input
-                      id='example-text'
+                      id={`examples-text-${index}`}
                       className='col-span-4'
-                      value={example.text}
+                      value={examples.text}
                       onChange={(e) => {
                         handleChangeExample(
                           e.currentTarget.value,
@@ -303,17 +268,19 @@ export function WordForm({ action }: WordFormProps) {
                           'text'
                         );
                       }}
-                      disabled={hardDisabled}
+                      disabled={disabled}
                     />
                   </div>
                   <div className='grid grid-cols-5 items-center gap-4'>
-                    <Label htmlFor='example-hiragana' className='text-right'>
+                    <Label
+                      htmlFor={`examples-hiragana-${index}`}
+                      className='text-right'>
                       Hiragana
                     </Label>
                     <Input
-                      id='example-hiragana'
+                      id={`examples-hiragana-${index}`}
                       className='col-span-4'
-                      value={example.hiragana}
+                      value={examples.hiragana}
                       onChange={(e) => {
                         handleChangeExample(
                           e.currentTarget.value,
@@ -321,17 +288,19 @@ export function WordForm({ action }: WordFormProps) {
                           'hiragana'
                         );
                       }}
-                      disabled={hardDisabled}
+                      disabled={disabled}
                     />
                   </div>
                   <div className='grid grid-cols-5 items-center gap-4'>
-                    <Label htmlFor='example-meaning' className='text-right'>
+                    <Label
+                      htmlFor={`examples-meaning-${index}`}
+                      className='text-right'>
                       Ý nghĩa
                     </Label>
                     <Input
-                      id='example-meaning'
+                      id={`examples-meaning-${index}`}
                       className='col-span-4'
-                      value={example.meaning}
+                      value={examples.meaning}
                       onChange={(e) => {
                         handleChangeExample(
                           e.currentTarget.value,
@@ -339,7 +308,7 @@ export function WordForm({ action }: WordFormProps) {
                           'meaning'
                         );
                       }}
-                      disabled={hardDisabled}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -350,7 +319,7 @@ export function WordForm({ action }: WordFormProps) {
                   onClick={() => {
                     handleRemoveExample(index);
                   }}
-                  disabled={hardDisabled}>
+                  disabled={disabled}>
                   <X />
                 </Button>
               </div>
@@ -363,7 +332,7 @@ export function WordForm({ action }: WordFormProps) {
             size='icon'
             className='rounded-full aspect-square'
             onClick={handleAddExample}
-            disabled={hardDisabled}>
+            disabled={disabled}>
             <Plus />
           </Button>
         </div>

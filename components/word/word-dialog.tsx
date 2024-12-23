@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/dialog';
 import { WordForm } from './word-form';
 import { ScrollArea } from '../ui/scroll-area';
+import { useWord } from '@/context/word-context';
+import { Loader2 } from 'lucide-react';
 
 interface WordDialogProps {
   action: 'view' | 'update' | 'create';
@@ -25,6 +27,8 @@ export function WordDialog({
   isOpen,
   setIsOpen,
 }: WordDialogProps) {
+  const { addWord, loading, updateWord, setIsOpenDialog } = useWord();
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className='md:h-[90%] h-full md:min-w-[90%] min-w-full flex flex-col'>
@@ -38,7 +42,30 @@ export function WordDialog({
           </div>
         </ScrollArea>
         <DialogFooter>
-          <Button type='submit'>{action === 'view' ? 'Xong' : 'Lưu'}</Button>
+          {!loading ? (
+            <Button
+              type='submit'
+              onClick={() => {
+                switch (action) {
+                  case 'view':
+                    setIsOpenDialog(false);
+                    break;
+                  case 'create':
+                    addWord();
+                    break;
+                  case 'update':
+                    updateWord();
+                    break;
+                }
+              }}>
+              {action === 'view' ? 'Xong' : 'Lưu'}
+            </Button>
+          ) : (
+            <Button disabled>
+              <Loader2 className='animate-spin' />
+              Vui lòng đợi
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

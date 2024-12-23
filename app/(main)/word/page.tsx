@@ -10,40 +10,33 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { DataTable } from '@/components/word/data-table';
-import { columns, Word } from '@/components/word/column';
+import { columns, WordRow } from '@/components/word/column';
 import { WordDialog } from '@/components/word/word-dialog';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-
-const data: Word[] = [
-  { text: '怖い', hiragana: 'こわい', meaning: 'Sợ hãi' },
-  { text: '恐れ', hiragana: 'おそれ', meaning: 'Nỗi sợ' },
-  { text: '不安', hiragana: 'ふあん', meaning: 'Lo âu' },
-  { text: '緊張', hiragana: 'きんちょう', meaning: 'Căng thẳng' },
-  { text: '怖気', hiragana: 'おじけ', meaning: 'Sự run sợ' },
-  { text: '心配', hiragana: 'しんぱい', meaning: 'Lo lắng' },
-  { text: '恐怖症', hiragana: 'きょうふしょう', meaning: 'Chứng sợ hãi' },
-  { text: '戦慄', hiragana: 'せんりつ', meaning: 'Rùng mình' },
-  { text: '不安定', hiragana: 'ふあんてい', meaning: 'Không ổn định' },
-  { text: '恐ろしい', hiragana: 'おそろしい', meaning: 'Kinh khủng' },
-  {
-    text: '精神的な苦痛',
-    hiragana: 'せいしんてきなくつう',
-    meaning: 'Đau khổ về mặt tinh thần',
-  },
-  { text: '戦争', hiragana: 'せんそう', meaning: 'Chiến tranh' },
-  { text: '衝撃', hiragana: 'しょうげき', meaning: 'Cú sốc' },
-  { text: '恐慌', hiragana: 'きょうこう', meaning: 'Hoảng loạn' },
-  { text: '危険', hiragana: 'きけん', meaning: 'Nguy hiểm' },
-  { text: '恐竜', hiragana: 'きょうりゅう', meaning: 'Khủng long' },
-  { text: '暗闇', hiragana: 'くらやみ', meaning: 'Bóng tối' },
-  { text: 'パニック', hiragana: 'ぱにっく', meaning: 'Hoảng loạn' },
-  { text: '不安感', hiragana: 'ふあんかん', meaning: 'Cảm giác lo âu' },
-  { text: '恐怖映画', hiragana: 'きょうふえいが', meaning: 'Phim kinh dị' },
-];
+import { useWord } from '@/context/word-context';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Loader2 } from 'lucide-react';
 
 export default function WordPage() {
-  const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false);
+  const { data } = useWord();
+  const {
+    setWordById,
+    setIsOpenDialog,
+    isOpenDialog,
+    setDialogAction,
+    dialogAction,
+    deleteWord,
+    loading,
+  } = useWord();
 
   return (
     <ContentLayout title='Dashboard'>
@@ -69,18 +62,68 @@ export default function WordPage() {
       <Button
         className='absolute top-20 right-8'
         onClick={() => {
-          setIsOpenCreateDialog((prev) => !prev);
+          setWordById();
+          setDialogAction('create');
+          setIsOpenDialog(true);
         }}>
         Thêm từ vựng
       </Button>
       <WordDialog
         action='create'
-        isOpen={isOpenCreateDialog}
-        setIsOpen={setIsOpenCreateDialog}
+        isOpen={isOpenDialog && dialogAction === 'create'}
+        setIsOpen={setIsOpenDialog}
         description='Điền thông tin từ vựng. Vui lòng bấm lưu xong khi điền xong.'
         title='Thêm từ vựng'
       />
-      <DataTable columns={columns} data={data} />
+      <WordDialog
+        action='update'
+        isOpen={isOpenDialog && dialogAction === 'update'}
+        setIsOpen={setIsOpenDialog}
+        title='Cập nhật tự vựng'
+        description='Điền thông tin từ vựng. Vui lòng bấm lưu xong khi điền xong.'
+      />
+      <WordDialog
+        action='view'
+        isOpen={isOpenDialog && dialogAction === 'view'}
+        setIsOpen={setIsOpenDialog}
+        title='Từ vựng'
+        description=''
+      />
+      <AlertDialog open={isOpenDialog && dialogAction === 'delete'}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa từ vựng</AlertDialogTitle>
+            <AlertDialogDescription>
+              Thao tác này không thể hoàn tác
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsOpenDialog(false);
+              }}>
+              Hủy
+            </AlertDialogCancel>
+            {!loading ? (
+              <AlertDialogAction onClick={deleteWord}>Xóa</AlertDialogAction>
+            ) : (
+              <AlertDialogAction disabled>
+                <Loader2 className='animate-spin' />
+                Vui lòng đợi
+              </AlertDialogAction>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <DataTable
+        columns={columns}
+        data={data.map<WordRow>((word) => ({
+          _id: word._id,
+          text: word.text,
+          hiragana: word.hiragana[0],
+          meaning: word.meaning[0].content,
+        }))}
+      />
     </ContentLayout>
   );
 }
