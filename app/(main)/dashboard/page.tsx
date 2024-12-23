@@ -9,29 +9,18 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useSidebar } from '@/hooks/use-sidebar';
-import { useStore } from '@/hooks/use-store';
-import { Button } from '@/components/ui/button';
+import { Statistics } from '@/components/dashboard/statistics';
+import { BookA, Languages, Users } from 'lucide-react';
+import { Chart } from '@/components/dashboard/area-chart';
 
 export default function DashboardPage() {
-  const sidebar = useStore(useSidebar, (x) => x);
-  if (!sidebar) return null;
-  const { settings, setSettings } = sidebar;
   return (
     <ContentLayout title='Dashboard'>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href='/'>Home</Link>
+              <Link href='/'>Trang chủ</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -40,43 +29,14 @@ export default function DashboardPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <TooltipProvider>
-        <div className='flex gap-6 mt-6'>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className='flex items-center space-x-2'>
-                <Switch
-                  id='is-hover-open'
-                  onCheckedChange={(x) => setSettings({ isHoverOpen: x })}
-                  checked={settings.isHoverOpen}
-                />
-                <Label htmlFor='is-hover-open'>Hover Open</Label>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>When hovering on the sidebar in mini state, it will open</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className='flex items-center space-x-2'>
-                <Switch
-                  id='disable-sidebar'
-                  onCheckedChange={(x) => setSettings({ disabled: x })}
-                  checked={settings.disabled}
-                />
-                <Label htmlFor='disable-sidebar'>Disable Sidebar</Label>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Hide sidebar</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </TooltipProvider>
-      <Button asChild className='m-10'>
-        <Link href='/login'>Đăng nhập</Link>
-      </Button>
+      <div className='grid auto-rows-min gap-4 md:grid-cols-3 mt-5'>
+        <Statistics title='Tổng người dùng' count={3232} icon={Users} />
+        <Statistics title='Tổng Hán tự' count={4544} icon={Languages} />
+        <Statistics title='Tổng từ vựng' count={2322} icon={BookA} />
+      </div>
+      <div className='mt-5'>
+        <Chart />
+      </div>
     </ContentLayout>
   );
 }

@@ -9,28 +9,49 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useSidebar } from '@/hooks/use-sidebar';
-import { useStore } from '@/hooks/use-store';
+import { DataTable } from '@/components/word/data-table';
+import { columns, Word } from '@/components/word/column';
+import { WordDialog } from '@/components/word/word-dialog';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+
+const data: Word[] = [
+  { text: '怖い', hiragana: 'こわい', meaning: 'Sợ hãi' },
+  { text: '恐れ', hiragana: 'おそれ', meaning: 'Nỗi sợ' },
+  { text: '不安', hiragana: 'ふあん', meaning: 'Lo âu' },
+  { text: '緊張', hiragana: 'きんちょう', meaning: 'Căng thẳng' },
+  { text: '怖気', hiragana: 'おじけ', meaning: 'Sự run sợ' },
+  { text: '心配', hiragana: 'しんぱい', meaning: 'Lo lắng' },
+  { text: '恐怖症', hiragana: 'きょうふしょう', meaning: 'Chứng sợ hãi' },
+  { text: '戦慄', hiragana: 'せんりつ', meaning: 'Rùng mình' },
+  { text: '不安定', hiragana: 'ふあんてい', meaning: 'Không ổn định' },
+  { text: '恐ろしい', hiragana: 'おそろしい', meaning: 'Kinh khủng' },
+  {
+    text: '精神的な苦痛',
+    hiragana: 'せいしんてきなくつう',
+    meaning: 'Đau khổ về mặt tinh thần',
+  },
+  { text: '戦争', hiragana: 'せんそう', meaning: 'Chiến tranh' },
+  { text: '衝撃', hiragana: 'しょうげき', meaning: 'Cú sốc' },
+  { text: '恐慌', hiragana: 'きょうこう', meaning: 'Hoảng loạn' },
+  { text: '危険', hiragana: 'きけん', meaning: 'Nguy hiểm' },
+  { text: '恐竜', hiragana: 'きょうりゅう', meaning: 'Khủng long' },
+  { text: '暗闇', hiragana: 'くらやみ', meaning: 'Bóng tối' },
+  { text: 'パニック', hiragana: 'ぱにっく', meaning: 'Hoảng loạn' },
+  { text: '不安感', hiragana: 'ふあんかん', meaning: 'Cảm giác lo âu' },
+  { text: '恐怖映画', hiragana: 'きょうふえいが', meaning: 'Phim kinh dị' },
+];
 
 export default function WordPage() {
-  const sidebar = useStore(useSidebar, (x) => x);
-  if (!sidebar) return null;
-  const { settings, setSettings } = sidebar;
+  const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false);
+
   return (
     <ContentLayout title='Dashboard'>
-      <Breadcrumb>
+      <Breadcrumb className='mb-5'>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href='/'>Home</Link>
+              <Link href='/'>Trang chủ</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -45,40 +66,21 @@ export default function WordPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <TooltipProvider>
-        <div className='flex gap-6 mt-6'>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className='flex items-center space-x-2'>
-                <Switch
-                  id='is-hover-open'
-                  onCheckedChange={(x) => setSettings({ isHoverOpen: x })}
-                  checked={settings.isHoverOpen}
-                />
-                <Label htmlFor='is-hover-open'>Hover Open</Label>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>When hovering on the sidebar in mini state, it will open</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className='flex items-center space-x-2'>
-                <Switch
-                  id='disable-sidebar'
-                  onCheckedChange={(x) => setSettings({ disabled: x })}
-                  checked={settings.disabled}
-                />
-                <Label htmlFor='disable-sidebar'>Disable Sidebar</Label>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Hide sidebar</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </TooltipProvider>
+      <Button
+        className='absolute top-20 right-8'
+        onClick={() => {
+          setIsOpenCreateDialog((prev) => !prev);
+        }}>
+        Thêm từ vựng
+      </Button>
+      <WordDialog
+        action='create'
+        isOpen={isOpenCreateDialog}
+        setIsOpen={setIsOpenCreateDialog}
+        description='Điền thông tin từ vựng. Vui lòng bấm lưu xong khi điền xong.'
+        title='Thêm từ vựng'
+      />
+      <DataTable columns={columns} data={data} />
     </ContentLayout>
   );
 }
