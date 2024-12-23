@@ -15,12 +15,14 @@ import {
   TooltipContent,
   TooltipProvider,
 } from '@/components/ui/tooltip';
+import { useAuth } from '@/context/auth-context';
 
 interface MenuProps {
   isOpen: boolean | undefined;
 }
 
 export function Menu({ isOpen }: MenuProps) {
+  const { logout } = useAuth();
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
 
@@ -66,12 +68,12 @@ export function Menu({ isOpen }: MenuProps) {
                                   : 'ghost'
                               }
                               className='w-full justify-start h-10 mb-1'
-                              asChild
-                            >
+                              asChild>
                               <Link href={href}>
                                 <span
-                                  className={cn(isOpen === false ? '' : 'mr-4')}
-                                >
+                                  className={cn(
+                                    isOpen === false ? '' : 'mr-4'
+                                  )}>
                                   <Icon size={18} />
                                 </span>
                                 <p
@@ -80,8 +82,7 @@ export function Menu({ isOpen }: MenuProps) {
                                     isOpen === false
                                       ? '-translate-x-96 opacity-0'
                                       : 'translate-x-0 opacity-100'
-                                  )}
-                                >
+                                  )}>
                                   {label}
                                 </p>
                               </Link>
@@ -118,10 +119,9 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => {}}
+                    onClick={logout}
                     variant='outline'
-                    className='w-full justify-center h-10 mt-5'
-                  >
+                    className='w-full justify-center h-10 mt-5'>
                     <span className={cn(isOpen === false ? '' : 'mr-4')}>
                       <LogOut size={18} />
                     </span>
@@ -129,8 +129,7 @@ export function Menu({ isOpen }: MenuProps) {
                       className={cn(
                         'whitespace-nowrap',
                         isOpen === false ? 'opacity-0 hidden' : 'opacity-100'
-                      )}
-                    >
+                      )}>
                       Đăng xuất
                     </p>
                   </Button>
