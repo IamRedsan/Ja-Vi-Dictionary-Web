@@ -9,179 +9,69 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { DataTable } from '@/components/table/data-table';
-import { columns, IUser } from '@/components/table/user-rows';
-const generateISODate = (): string => {
-  return new Date().toISOString();
-};
+import { DataTable } from '@/components/user/data-table';
+import { ActionCell, IUser } from '@/components/user/user-rows';
+import { useEffect, useState } from 'react';
+import { AxiosError } from 'axios';
+import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
+import { authClient } from '@/client/axiosClient';
+import { ColumnDef } from '@tanstack/react-table';
+import { FaLockOpen, FaLock } from 'react-icons/fa';
 export default function UserPage() {
-  const data: IUser[] = [
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<IUser[]>([]);
+
+  useEffect(() => {
+    const handleGetListUser = async () => {
+      try {
+        setLoading(true);
+        const response = await authClient.get('/users');
+        setData(response.data.data.data);
+        setLoading(false);
+      } catch (err) {
+        const e = err as AxiosError;
+        const message = (e.response?.data as any)?.message;
+        toast({
+          title: 'Lấy thông tin người dùng thất bại',
+          description: message ?? 'Lỗi không xác định.',
+        });
+      }
+    };
+    handleGetListUser();
+  }, [toast]);
+  const columns: ColumnDef<IUser>[] = [
     {
-      _id: '1',
-      email: 'johndoe@example.com',
-      username: 'johndoe',
-      fullname: 'John Doe',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      role: 'user',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: true,
+      accessorKey: 'fullname',
+      header: 'Họ và tên',
     },
     {
-      _id: '2',
-      email: 'janedoe@example.com',
-      username: 'janedoe',
-      fullname: 'Jane Doe',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      role: 'admin',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: false,
+      accessorKey: 'email',
+      header: 'Email',
     },
     {
-      _id: '3',
-      email: 'bobjohnson@example.com',
-      username: 'bobjohnson',
-      fullname: 'Bob Johnson',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-      role: 'user',
-      isBanned: true,
-      createdAt: generateISODate(),
-      isVerify: true,
+      header: 'Bị cấm',
+      cell: ({ row }) => {
+        const user = row.original;
+        return user.isBanned ? (
+          <div className='ml-2'>
+            <FaLock />
+          </div>
+        ) : (
+          <div className='ml-2'>
+            <FaLockOpen />
+          </div>
+        );
+      },
     },
     {
-      _id: '4',
-      email: 'alicewong@example.com',
-      username: 'alicewong',
-      fullname: 'Alice Wong',
-      avatar: 'https://i.pravatar.cc/150?img=4',
-      role: 'user',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: true,
-    },
-    {
-      _id: '5',
-      email: 'michaelbrown@example.com',
-      username: 'michaelbrown',
-      fullname: 'Michael Brown',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-      role: 'admin',
-      isBanned: true,
-      createdAt: generateISODate(),
-      isVerify: false,
-    },
-    {
-      _id: '1',
-      email: 'johndoe@example.com',
-      username: 'johndoe',
-      fullname: 'John Doe',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      role: 'user',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: true,
-    },
-    {
-      _id: '2',
-      email: 'janedoe@example.com',
-      username: 'janedoe',
-      fullname: 'Jane Doe',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      role: 'admin',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: false,
-    },
-    {
-      _id: '3',
-      email: 'bobjohnson@example.com',
-      username: 'bobjohnson',
-      fullname: 'Bob Johnson',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-      role: 'user',
-      isBanned: true,
-      createdAt: generateISODate(),
-      isVerify: true,
-    },
-    {
-      _id: '4',
-      email: 'alicewong@example.com',
-      username: 'alicewong',
-      fullname: 'Alice Wong',
-      avatar: 'https://i.pravatar.cc/150?img=4',
-      role: 'user',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: true,
-    },
-    {
-      _id: '5',
-      email: 'michaelbrown@example.com',
-      username: 'michaelbrown',
-      fullname: 'Michael Brown',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-      role: 'admin',
-      isBanned: true,
-      createdAt: generateISODate(),
-      isVerify: false,
-    },
-    {
-      _id: '1',
-      email: 'johndoe@example.com',
-      username: 'johndoe',
-      fullname: 'John Doe',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      role: 'user',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: true,
-    },
-    {
-      _id: '2',
-      email: 'janedoe@example.com',
-      username: 'janedoe',
-      fullname: 'Jane Doe',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      role: 'admin',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: false,
-    },
-    {
-      _id: '3',
-      email: 'bobjohnson@example.com',
-      username: 'bobjohnson',
-      fullname: 'Bob Johnson',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-      role: 'user',
-      isBanned: true,
-      createdAt: generateISODate(),
-      isVerify: true,
-    },
-    {
-      _id: '4',
-      email: 'alicewong@example.com',
-      username: 'alicewong',
-      fullname: 'Alice Wong',
-      avatar: 'https://i.pravatar.cc/150?img=4',
-      role: 'user',
-      isBanned: false,
-      createdAt: generateISODate(),
-      isVerify: true,
-    },
-    {
-      _id: '5',
-      email: 'michaelbrown@example.com',
-      username: 'michaelbrown',
-      fullname: 'Michael Brown',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-      role: 'admin',
-      isBanned: true,
-      createdAt: generateISODate(),
-      isVerify: false,
+      header: 'Hành động',
+      id: 'actions',
+      cell: ({ row }) => <ActionCell user={row.original} setData={setData} />,
     },
   ];
+
   return (
     <ContentLayout title='Danh sách người dùng'>
       <Breadcrumb>
@@ -198,7 +88,11 @@ export default function UserPage() {
         </BreadcrumbList>
       </Breadcrumb>
       <div className='container mx-auto py-10'>
-        <DataTable columns={columns} data={data} />
+        {loading ? (
+          <Skeleton className='w-full h-[600px]' />
+        ) : (
+          <DataTable columns={columns} data={data} setData={setData} />
+        )}
       </div>
     </ContentLayout>
   );

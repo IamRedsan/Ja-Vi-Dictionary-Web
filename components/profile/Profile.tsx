@@ -24,7 +24,7 @@ interface ProfileProps {
   email: string;
   fullname: string;
   avatar: string;
-  isVerify: boolean;
+  verified: boolean;
   createdAt: string;
   className?: string;
   isUserDetail?: boolean;
@@ -34,7 +34,7 @@ const Profile: React.FC<ProfileProps> = ({
   avatar = 'https://i.pinimg.com/736x/d9/15/81/d91581de263f6d3ac050e5e30f44ae2e.jpg',
   email = 'voviettruong141003@gmail.com',
   fullname = 'Võ Viết Trường',
-  isVerify = false,
+  verified,
   createdAt = '2024-12-22T15:35:19.356Z',
   className,
   isUserDetail,
@@ -59,14 +59,11 @@ const Profile: React.FC<ProfileProps> = ({
 
   const handleUpdateInfo = async () => {
     setLoading(true);
-    console.log('Updating fullname:', fullnameValue);
-
     try {
       const response = await authClient.put('/users/profile', {
         fullname: fullnameValue,
       });
       const { data: user } = response.data;
-      console.log('Updated user:', user);
       updateUser(user);
       setFullnameValue(user.fullname);
       toast({
@@ -194,7 +191,7 @@ const Profile: React.FC<ProfileProps> = ({
       <div className='flex-[7] bg-background py-2 px-6'>
         <div className='text-sm my-2'>Email</div>
         <Input className=' my-2' disabled value={email} />
-        {!isVerify && (
+        {!verified && (
           <div className='rounded  p-2 my-4'>
             <div className='flex flex-row gap-2 items-center'>
               <FaLock />

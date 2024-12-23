@@ -30,7 +30,7 @@ export default function ProfilePage() {
         </BreadcrumbList>
       </Breadcrumb>
       <div className=''>
-        <Profile {...user} className='w-[600px]' isVerify />
+        <Profile {...user} className='w-[600px]' verified />
       </div>
     </ContentLayout>
   );

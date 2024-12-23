@@ -22,9 +22,10 @@ import {
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
 import Profile from '../profile/Profile';
-import { FaLockOpen, FaLock } from 'react-icons/fa';
+import { authClient } from '@/client/axiosClient';
+import { useToast } from '@/hooks/use-toast';
+import { AxiosError } from 'axios';
 
 export interface IUser {
   _id: string;
@@ -35,12 +36,42 @@ export interface IUser {
   role: 'user' | 'admin';
   isBanned: boolean;
   createdAt: string;
-  isVerify: boolean;
+  verified: boolean;
 }
 
-const ActionCell = ({ user }: { user: IUser }) => {
+export const ActionCell = ({
+  user,
+  setData,
+}: {
+  user: IUser;
+  setData: React.Dispatch<React.SetStateAction<IUser[]>>;
+}) => {
   const [isDialogOpenDetail, setIsDialogOpenDetail] = useState(false);
   const [isDialogOpenBanned, setIsDialogOpenBanned] = useState(false);
+  const { toast } = useToast();
+  const handleBann = async () => {
+    try {
+      await authClient.put(`/users/ban/${user._id}`);
+      setData((prevData) =>
+        prevData.map((u) =>
+          u._id === user._id ? { ...u, isBanned: !u.isBanned } : u
+        )
+      );
+      toast({
+        title: 'Chúc mừng',
+        description: `Bạn đã ${user.isBanned ? 'mở cấm' : 'cấm'} ${
+          user.fullname
+        } thành công`,
+      });
+    } catch (err) {
+      const e = err as AxiosError;
+      const message = (e.response?.data as any)?.message;
+      toast({
+        title: 'Đổi mật khẩu thất bại',
+        description: message ?? 'Lỗi không xác định.',
+      });
+    }
+  };
   return (
     <>
       <DropdownMenu>
@@ -56,7 +87,7 @@ const ActionCell = ({ user }: { user: IUser }) => {
             Xem chi tiết
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsDialogOpenBanned(true)}>
-            Cấm
+            {`${user.isBanned ? 'Mở cấm' : 'Cấm'}`}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -74,48 +105,18 @@ const ActionCell = ({ user }: { user: IUser }) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Bạn có chắc chắn không?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có muốn cấm {user.fullname}
+              Bạn có muốn {`${user.isBanned ? 'mở cấm' : 'cấm'}`}{' '}
+              {user.fullname}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setIsDialogOpenBanned(false)}>
               Huỷ
             </AlertDialogCancel>
-            <AlertDialogAction>Xác nhận</AlertDialogAction>
+            <AlertDialogAction onClick={handleBann}>Xác nhận</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
   );
 };
-
-export const columns: ColumnDef<IUser>[] = [
-  {
-    accessorKey: 'fullname',
-    header: 'Họ và tên',
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-  },
-  {
-    header: 'Bị cấm',
-    cell: ({ row }) => {
-      const user = row.original;
-      return user.isBanned ? (
-        <div className='ml-2'>
-          <FaLock />
-        </div>
-      ) : (
-        <div className='ml-2'>
-          <FaLockOpen />
-        </div>
-      );
-    },
-  },
-  {
-    header: 'Hành động',
-    id: 'actions',
-    cell: ({ row }) => <ActionCell user={row.original} />,
-  },
-];

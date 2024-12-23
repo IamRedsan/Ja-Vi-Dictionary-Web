@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AuthProvider } from '@/context/auth-context';
 import { Toaster } from '@/components/ui/toaster';
+import { CompositionProvider } from '@/context/composition-context';
 
 const roboto = Roboto({ subsets: ['vietnamese'], weight: '400' });
 
@@ -21,7 +22,9 @@ export default function RootLayout({
     <html lang='vi' suppressHydrationWarning>
       <body className={`${roboto.className} antialiased`}>
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <CompositionProvider>{children}</CompositionProvider>
+          </AuthProvider>
         </ThemeProvider>
         <Toaster />
       </body>
