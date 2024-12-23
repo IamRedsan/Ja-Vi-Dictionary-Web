@@ -61,11 +61,6 @@ export function getMenuList(pathname: string): Group[] {
           label: 'Người dùng',
           icon: Users,
         },
-        {
-          href: '/comment',
-          label: 'Bình luận',
-          icon: MessageSquareMore,
-        },
       ],
     },
     {

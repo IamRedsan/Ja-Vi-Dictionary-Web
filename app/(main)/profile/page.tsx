@@ -9,14 +9,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-
-import { useSidebar } from '@/hooks/use-sidebar';
-import { useStore } from '@/hooks/use-store';
 import Profile from '@/components/profile/Profile';
+import { useAuth } from '@/context/auth-context';
 
 export default function ProfilePage() {
-  const sidebar = useStore(useSidebar, (x) => x);
-  if (!sidebar) return null;
+  const { user } = useAuth();
   return (
     <ContentLayout title='Thông tin quản lý'>
       <Breadcrumb>
@@ -33,7 +30,7 @@ export default function ProfilePage() {
         </BreadcrumbList>
       </Breadcrumb>
       <div className=''>
-        <Profile className='w-[600px]' isVerify />
+        <Profile {...user} className='w-[600px]' isVerify />
       </div>
     </ContentLayout>
   );
