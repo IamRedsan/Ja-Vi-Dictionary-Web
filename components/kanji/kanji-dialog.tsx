@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/dialog';
 import { KanjiForm } from './kanji-form';
 import { ScrollArea } from '../ui/scroll-area';
+import { useKanji } from '@/context/kanji-context';
+import { Loader2 } from 'lucide-react';
 
 interface KanjiDialogProps {
   action: 'view' | 'update' | 'create';
@@ -25,6 +27,7 @@ export function KanjiDialog({
   isOpen,
   setIsOpen,
 }: KanjiDialogProps) {
+  const { addKanji, loading, updateKanji, setIsOpenDialog } = useKanji();
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className='md:h-[90%] h-full md:min-w-[90%] min-w-full flex flex-col'>
@@ -38,7 +41,30 @@ export function KanjiDialog({
           </div>
         </ScrollArea>
         <DialogFooter>
-          <Button type='submit'>{action === 'view' ? 'Xong' : 'Lưu'}</Button>
+          {!loading ? (
+            <Button
+              type='submit'
+              onClick={() => {
+                switch (action) {
+                  case 'view':
+                    setIsOpenDialog(false);
+                    break;
+                  case 'create':
+                    addKanji();
+                    break;
+                  case 'update':
+                    updateKanji();
+                    break;
+                }
+              }}>
+              {action === 'view' ? 'Xong' : 'Lưu'}
+            </Button>
+          ) : (
+            <Button disabled>
+              <Loader2 className='animate-spin' />
+              Vui lòng đợi
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

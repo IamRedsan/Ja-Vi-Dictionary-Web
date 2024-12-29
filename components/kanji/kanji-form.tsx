@@ -2,62 +2,31 @@ import { Plus, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import MultipleSelector, { Option } from './multiple-selector';
-
-interface Kanji {
-  text: string;
-  phonetic: string[];
-  onyomi: string[];
-  kunyomi: string[];
-  stroke: number;
-  jlpt_level: number;
-  composition: number[];
-  meaning: string;
-}
+import { Textarea } from '@/components/ui/textarea';
+import { useKanji } from '@/context/kanji-context';
 
 interface KanjiFormProps {
   action: 'view' | 'update' | 'create';
 }
 
-const OPTIONS: Option[] = [
-  { label: 'nextjs', value: 'nextjs' },
-  { label: 'React', value: 'react' },
-  { label: 'Remix', value: 'remix' },
-  { label: 'Vite', value: 'vite' },
-  { label: 'Nuxt', value: 'nuxt' },
-  { label: 'Vue', value: 'vue' },
-  { label: 'Svelte', value: 'svelte' },
-  { label: 'Angular', value: 'angular' },
-  { label: 'Ember', value: 'ember', disable: true },
-  { label: 'Gatsby', value: 'gatsby', disable: true },
-  { label: 'Astro', value: 'astro' },
-];
-
 export function KanjiForm({ action }: KanjiFormProps) {
-  const [kanji, setKanji] = useState<Kanji>({
-    text: '',
-    phonetic: [''],
-    onyomi: [''],
-    kunyomi: [''],
-    stroke: 0,
-    jlpt_level: 5,
-    composition: [],
-    meaning: '',
-  });
+  const { kanji, setKanji, loading } = useKanji();
+  const compositionValue =
+    kanji.composition
+      ?.map((item) => `${item.raw_text} ${item.phonetic}`)
+      .join(', ') || 'N/A';
 
   const hanleChangeField = (
     value: string | number,
-    field: 'text' | 'meaning' | 'stroke' | 'jlpt_level'
+    field: 'text' | 'meaning' | 'stroke' | 'jlpt_level' | 'stroke'
   ) => {
     setKanji((prevKanji) => ({
       ...prevKanji,
@@ -94,12 +63,6 @@ export function KanjiForm({ action }: KanjiFormProps) {
   };
 
   const hardDisabled = action === 'view';
-
-  useEffect(() => {
-    if (action !== 'create') {
-    }
-  }, [action]);
-
   return (
     <div className='grid md:grid-cols-2 gap-8 py-4 grid-cols-1 items-start'>
       <div className='grid gap-4'>
@@ -114,7 +77,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
             onChange={(e) => {
               hanleChangeField(e.currentTarget.value, 'text');
             }}
-            disabled={hardDisabled}
+            disabled={hardDisabled || loading}
           />
         </div>
         <div className='grid grid-cols-4 items-center gap-4'>
@@ -128,7 +91,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
             onChange={(e) => {
               handleChangeFieldArray(e.currentTarget.value, 0, 'phonetic');
             }}
-            disabled={hardDisabled}
+            disabled={hardDisabled || loading}
           />
         </div>
         {kanji.phonetic.map((phonetic, index) => {
@@ -146,7 +109,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
                       'phonetic'
                     );
                   }}
-                  disabled={hardDisabled}
+                  disabled={hardDisabled || loading}
                 />
                 <Button
                   variant='ghost'
@@ -155,7 +118,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
                   onClick={() => {
                     handleRemoveFieldArray(index, 'phonetic');
                   }}
-                  disabled={hardDisabled}>
+                  disabled={hardDisabled || loading}>
                   <X />
                 </Button>
               </div>
@@ -171,7 +134,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
               onClick={() => {
                 handleAddFieldArray('phonetic');
               }}
-              disabled={hardDisabled}>
+              disabled={hardDisabled || loading}>
               <Plus />
             </Button>
           </div>
@@ -187,7 +150,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
             onChange={(e) => {
               handleChangeFieldArray(e.currentTarget.value, 0, 'onyomi');
             }}
-            disabled={hardDisabled}
+            disabled={hardDisabled || loading}
           />
         </div>
         {kanji.onyomi.map((onyomi, index) => {
@@ -205,7 +168,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
                       'onyomi'
                     );
                   }}
-                  disabled={hardDisabled}
+                  disabled={hardDisabled || loading}
                 />
                 <Button
                   variant='ghost'
@@ -214,7 +177,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
                   onClick={() => {
                     handleRemoveFieldArray(index, 'onyomi');
                   }}
-                  disabled={hardDisabled}>
+                  disabled={hardDisabled || loading}>
                   <X />
                 </Button>
               </div>
@@ -230,7 +193,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
               onClick={() => {
                 handleAddFieldArray('onyomi');
               }}
-              disabled={hardDisabled}>
+              disabled={hardDisabled || loading}>
               <Plus />
             </Button>
           </div>
@@ -246,7 +209,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
             onChange={(e) => {
               handleChangeFieldArray(e.currentTarget.value, 0, 'kunyomi');
             }}
-            disabled={hardDisabled}
+            disabled={hardDisabled || loading}
           />
         </div>
         {kanji.kunyomi.map((kunyomi, index) => {
@@ -264,7 +227,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
                       'kunyomi'
                     );
                   }}
-                  disabled={hardDisabled}
+                  disabled={hardDisabled || loading}
                 />
                 <Button
                   variant='ghost'
@@ -273,7 +236,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
                   onClick={() => {
                     handleRemoveFieldArray(index, 'kunyomi');
                   }}
-                  disabled={hardDisabled}>
+                  disabled={hardDisabled || loading}>
                   <X />
                 </Button>
               </div>
@@ -289,7 +252,7 @@ export function KanjiForm({ action }: KanjiFormProps) {
               onClick={() => {
                 handleAddFieldArray('kunyomi');
               }}
-              disabled={hardDisabled}>
+              disabled={hardDisabled || loading}>
               <Plus />
             </Button>
           </div>
@@ -298,10 +261,13 @@ export function KanjiForm({ action }: KanjiFormProps) {
       <div className='flex flex-col gap-4'>
         <div className='grid grid-cols-4 items-center gap-4'>
           <Label htmlFor='jltp_level' className='text-right'>
-            JLTP
+            JLPT
           </Label>
-          <Select>
-            <SelectTrigger className='col-span-3' id='jltp_level'>
+          <Select value={String(kanji.jlpt_level)}>
+            <SelectTrigger
+              className='col-span-3'
+              id='jltp_level'
+              disabled={hardDisabled || loading}>
               <SelectValue placeholder='Chọn level JLPT' />
             </SelectTrigger>
             <SelectContent>
@@ -319,21 +285,36 @@ export function KanjiForm({ action }: KanjiFormProps) {
           <Label htmlFor='stroke' className='text-right'>
             Số nét
           </Label>
-          <Input id='stroke' className='col-span-3' type='number' min={0} />
+          <Input
+            value={kanji.stroke}
+            onChange={(e) => {
+              hanleChangeField(e.currentTarget.value, 'stroke');
+            }}
+            id='stroke'
+            className='col-span-3'
+            type='number'
+            min={0}
+            disabled={hardDisabled || loading}
+          />
+        </div>
+        <div className='grid grid-cols-4 items-center gap-4'>
+          <Label htmlFor='stroke' className='text-right'>
+            Ý nghĩa
+          </Label>
+          <Textarea
+            value={kanji.meaning}
+            onChange={(e) => {
+              hanleChangeField(e.currentTarget.value, 'meaning');
+            }}
+            className='col-span-3'
+            disabled={hardDisabled || loading}
+          />
         </div>
         <div className='grid grid-cols-4 items-center gap-4'>
           <Label htmlFor='compositions' className='text-right'>
             Bộ thủ
           </Label>
-          <MultipleSelector
-            commandProps={{ className: 'col-span-3' }}
-            defaultOptions={OPTIONS}
-            emptyIndicator={
-              <p className='text-center leading-10 text-gray-600 dark:text-gray-400'>
-                Trống
-              </p>
-            }
-          />
+          <Input className='col-span-3' disabled value={compositionValue} />
         </div>
       </div>
     </div>

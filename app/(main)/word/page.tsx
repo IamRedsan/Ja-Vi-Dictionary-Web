@@ -39,7 +39,7 @@ export default function WordPage() {
   } = useWord();
 
   return (
-    <ContentLayout title='Dashboard'>
+    <ContentLayout title='Danh sách từ vựng'>
       <Breadcrumb className='mb-5'>
         <BreadcrumbList>
           <BreadcrumbItem>

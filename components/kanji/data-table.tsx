@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/table';
 
 import { DataTablePagination } from './pagination';
+import { useKanji } from '@/context/kanji-context';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -27,13 +28,18 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const { pagination, setPagination, pageCount } = useKanji();
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
+    pageCount: pageCount,
+    state: {
+      pagination,
+    },
+    onPaginationChange: setPagination,
   });
-
   return (
     <div>
       <div className='rounded-md border'>
