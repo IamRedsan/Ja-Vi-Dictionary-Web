@@ -8,20 +8,19 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { KanjiDialog } from './kanji-dialog';
-import { useState } from 'react';
+import { useKanji } from '@/context/kanji-context';
 
-export type Kanji = {
+export type KanjiRow = {
+  _id: string;
   text: string;
   phonetic: string;
   meaning: string;
   jlpt_level: string;
 };
 
-export const columns: ColumnDef<Kanji>[] = [
+export const columns: ColumnDef<KanjiRow>[] = [
   {
     accessorKey: 'text',
     header: 'Hán tự',
@@ -40,9 +39,9 @@ export const columns: ColumnDef<Kanji>[] = [
   },
   {
     id: 'actions',
-    cell: () => {
-      const [isOpenUpdateDialog, setIsOpenUpdateDialog] = useState(false);
-      const [isOpenViewDialog, setIsOpenViewDialog] = useState(false);
+    cell: ({ row }) => {
+      const { setKanjiById, setDialogAction, setIsOpenDialog } = useKanji();
+      const kanji = row.original;
 
       return (
         <>
@@ -56,34 +55,30 @@ export const columns: ColumnDef<Kanji>[] = [
             <DropdownMenuContent align='end'>
               <DropdownMenuItem
                 onClick={() => {
-                  setIsOpenViewDialog(true);
+                  setDialogAction('view');
+                  setKanjiById(kanji._id);
+                  setIsOpenDialog(true);
                 }}>
                 Chi tiết
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  setIsOpenUpdateDialog(true);
+                  setDialogAction('update');
+                  setKanjiById(kanji._id);
+                  setIsOpenDialog(true);
                 }}>
                 Cập nhật
               </DropdownMenuItem>
-              <DropdownMenuItem>Xóa</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setDialogAction('delete');
+                  setKanjiById(kanji._id);
+                  setIsOpenDialog(true);
+                }}>
+                Xóa
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <KanjiDialog
-            action='update'
-            isOpen={isOpenUpdateDialog}
-            setIsOpen={setIsOpenUpdateDialog}
-            title='Cập nhật Hán tự'
-            description='Điền thông tin Hán tự. Vui lòng bấm lưu xong khi điền xong.'
-          />
-          <KanjiDialog
-            action='view'
-            isOpen={isOpenViewDialog}
-            setIsOpen={setIsOpenViewDialog}
-            title='Hán tự'
-            description=''
-          />
         </>
       );
     },

@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/auth-context';
 import { Toaster } from '@/components/ui/toaster';
 import { CompositionProvider } from '@/context/composition-context';
 import { WordProvider } from '@/context/word-context';
+import { KanjiProvider } from '@/context/kanji-context';
 
 const roboto = Roboto({ subsets: ['vietnamese'], weight: '400' });
 
@@ -25,7 +26,9 @@ export default function RootLayout({
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
           <AuthProvider>
             <CompositionProvider>
-              <WordProvider>{children}</WordProvider>
+              <KanjiProvider>
+                <WordProvider>{children}</WordProvider>
+              </KanjiProvider>
             </CompositionProvider>
           </AuthProvider>
         </ThemeProvider>

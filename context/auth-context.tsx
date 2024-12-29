@@ -16,7 +16,7 @@ interface User {
   fullname: string;
   avatar?: string;
   role: 'user' | 'admin';
-  created_at: string;
+  createdAt: string;
 }
 
 interface AuthContextType {
